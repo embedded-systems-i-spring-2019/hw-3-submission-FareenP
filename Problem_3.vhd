@@ -36,32 +36,11 @@ begin
 end reg_a;
 
 library IEEE;
-use ieee.std_logic_1164.all;
-entity regis2 is
-port(LD, CLK :in std_logic;
-     r_in :in std_logic_vector(7 downto 0);
-     R_Out,Rout2 :out std_logic_vector(7 downto 0));
-end regis2;
-
-architecture reg_a of regis2 is
-begin
-    reg: process(CLK)
-    begin
-        if(rising_edge(CLK)) then
-            if(LD='1') then
-                R_out<=r_in;
-                Rout2<=r_in;
-            end if;
-        end if;
-     end process;
-end reg_a;
-
-library IEEE;
 use IEEE.std_logic_1164.all;
 entity whol_crt is
 port(LDA, LDB,S0,S1,CLK :in std_logic;
      X,Y :in std_logic_vector(7 downto 0);
-     RB :out std_logic_vector(7 downto 0));
+     RB :inout std_logic_vector(7 downto 0));
 end whol_crt;
 
 architecture stim_cirk of whol_crt is
@@ -77,16 +56,11 @@ component regis
      R_Out :out std_logic_vector(7 downto 0));
 end component;
 
-component regis2
-    port(LD, CLK :in std_logic;
-     r_in :in std_logic_vector(7 downto 0);
-     R_Out,Rout2 :out std_logic_vector(7 downto 0));
-end component;
 
 signal m1_out,regAOut,X_regB, m2out : std_logic_vector(7 downto 0);
 begin
 mux1 : multi21
-    port map(A0 => X_regB,
+    port map(A0 => RB,
              A1 => X,
              sel =>S1,
              m_out =>m1_out);
@@ -100,10 +74,9 @@ mux2 : multi21
              A1 => regaout,
              sel =>S0,
              m_out =>m2out);
-regb : regis2
+regb : regis
     port map(LD=> LDB,
              CLK => CLK,
              r_in=>m2out,
-             r_out=>X_regB,
-             rout2=>RB);
+             r_out=>RB);
 end stim_cirk;

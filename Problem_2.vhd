@@ -22,7 +22,7 @@ use IEEE.std_logic_1164.all;
 entity reg_8 is
 port( clk, load : in std_logic;
       reg_in :in std_logic_vector(7 downto 0);
-      reg_out1,reg_out2: out std_logic_vector(7 downto 0));
+      reg_out: out std_logic_vector(7 downto 0));
 end reg_8;
 
 architecture reg_8 of reg_8 is
@@ -31,8 +31,7 @@ begin
     begin
         if(falling_edge(CLK)) then
             if(load='1') then
-                reg_out1<=reg_in;
-                reg_out2<=reg_in;
+                reg_out<=reg_in;
             end if;
         end if;
      end process;
@@ -61,7 +60,7 @@ use IEEE.std_logic_1164.all;
 entity ckt_sim is
 port(X,Y,Z :in std_logic_vector(7 downto 0);
      MS : in std_logic_vector(1 downto 0);
-     RA,RB :out std_logic_vector(7 downto 0);
+     RA,RB :inout std_logic_vector(7 downto 0);
      CLK, DS :in std_logic);
 end ckt_sim;
      
@@ -75,8 +74,7 @@ end component;
 component reg_8
     port(clk, load : in std_logic;
          reg_in :in std_logic_vector(7 downto 0);
-         reg_out1 :out std_logic_vector(7 downto 0);
-         reg_out2: out std_logic_vector(7 downto 0));
+         reg_out :out std_logic_vector(7 downto 0));
 end component;
 
 component dec_21
@@ -93,7 +91,7 @@ begin
     port map(A => X,
              B => Y,
              C => Z,
-             D => m_rb,
+             D => RB,
              SEL => MS,
              Mux_out => m_out);
     
@@ -101,15 +99,13 @@ begin
     port map(clk => CLK,
              load => d0_ld,
              reg_in => m_out,
-             reg_out1 => RA,
-             reg_out2 => r_aout);
+             reg_out => RA);
              
     reg_b: reg_8
     port map(clk => CLK,
              load => d1_ld,
-             reg_in => r_aout,
-             reg_out1 => m_rb,
-             reg_out2 => RB);
+             reg_in => RA,
+             reg_out =>RB);
              
     deco_2_1: dec_21
     port map(d_in=> DS,

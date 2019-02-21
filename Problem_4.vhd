@@ -37,27 +37,6 @@ end reg_a;
 
 library IEEE;
 use ieee.std_logic_1164.all;
-entity reg2 is
-port(LD, CLK :in std_logic;
-     r_in :in std_logic_vector(7 downto 0);
-     R_Out,Rout2 :out std_logic_vector(7 downto 0));
-end reg2;
-
-architecture reg_a of reg2 is
-begin
-    reg: process(CLK)
-    begin
-        if(falling_edge(CLK)) then
-            if(LD='1') then
-                R_out<=r_in;
-                Rout2<=r_in;
-            end if;
-        end if;
-     end process;
-end reg_a;
-
-library IEEE;
-use ieee.std_logic_1164.all;
 entity an_gat is
 port(A1,A2 :in std_logic;
      a_out :out std_logic);
@@ -73,7 +52,8 @@ use ieee.std_logic_1164.all;
 entity crt_4 is
 port(LDB,LDA,RD,S1,S0,CLK : in std_logic;
      X,Y :in std_logic_vector(7 downto 0);
-     RA,RB :out std_logic_vector(7 downto 0));
+     RA :out std_logic_vector(7 downto 0);
+     RB :inout std_logic_vector(7 downto 0));
 end crt_4;
 
 architecture crt_4_sim of crt_4 is
@@ -89,18 +69,12 @@ component reg1
          R_Out :out std_logic_vector(7 downto 0));
 end component;
 
-component reg2
-    port(LD, CLK :in std_logic;
-         r_in :in std_logic_vector(7 downto 0);
-         R_Out,Rout2 :out std_logic_vector(7 downto 0));
-end component;
-
 component an_gat
     port(A1,A2 :in std_logic;
          a_out :out std_logic);
 end component;
 
-signal mux1_out, mux2_out, r_b_m2 : std_logic_vector(7 downto 0);
+signal mux1_out, mux2_out : std_logic_vector(7 downto 0);
 signal an_top, an_bot : std_logic;
 signal no_r : std_logic;
 begin
@@ -122,16 +96,15 @@ begin
              A2=>RD,
              a_out=>an_bot);
     
-    regB : reg2
+    regB : reg1
     port map(LD => an_top, 
              CLK =>clk,
              r_in => mux1_out,
-             R_Out=>RB,
-             Rout2=>r_b_m2);
+             R_Out=>RB);
              
     mux2 : multiplex21
     port map(A0=>Y,
-             A1 =>r_b_m2,
+             A1 =>RB,
              sel => S0,
              m_out => mux2_out);      
    
